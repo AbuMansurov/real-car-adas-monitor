@@ -36,7 +36,11 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # Тесты
-add_executable(RunTests tests/test_obd_parser.cpp src/obd_parser.cpp)
+add_executable(RunTests 
+    tests/test_obd_parser.cpp 
+    src/obd_parser.cpp 
+    src/dms_monitor.cpp
+)
 target_link_libraries(RunTests gtest gtest_main ${OpenCV_LIBS})
 enable_testing()
 add_test(NAME AllTests COMMAND RunTests)

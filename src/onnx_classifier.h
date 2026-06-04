@@ -1,39 +1,51 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <onnxruntime_cxx_api.h> // Главный заголовок ONNX Runtime
+#include <onnxruntime_cxx_api.h>
 
-// Структура для хранения результата классификации
+/**
+ * @brief Результат классификации стиля вождения.
+ */
 struct ClassificationResult {
-    int label;                  // Предсказанный класс (0, 1 или 2)
-    float confidence;           // Уверенность модели (от 0.0 до 1.0)
-    std::vector<float> scores;  // Массив вероятностей для всех 3 классов
+    int label;                  ///< Предсказанный класс (0/1/2)
+    float confidence;           ///< Уверенность модели (0.0 - 1.0)
+    std::vector<float> scores;  ///< Вероятности всех 3 классов
 };
 
-// Класс для инференса (запуска) нейросети
+/**
+ * @brief Классификатор стиля вождения на основе ONNX модели.
+ * 
+ * Загружает нейросеть из файла .onnx и параметры нормализации из JSON.
+ * Применяет Z-score нормализацию и Softmax для получения вероятностей.
+ */
 class ONNXClassifier {
 public:
-    // Конструктор: загружает модель и параметры нормализации
+    /**
+     * @brief Конструктор: загружает модель и параметры нормализации.
+     * @param modelPath Путь к файлу .onnx
+     * @param paramsPath Путь к файлу normalization_params.json
+     * @throws std::runtime_error Если файлы не найдены или модель невалидна
+     */
     ONNXClassifier(const std::string& modelPath, const std::string& paramsPath);
     
-    // Метод предсказания: принимает 6 признаков, возвращает результат
+    /**
+     * @brief Классифицирует стиль вождения по 6 признакам телеметрии.
+     * @param features Вектор из 6 float: [speed, rpm, throttle, coolant, fuel, intake]
+     * @return Структура ClassificationResult с предсказанием и уверенностью
+     * @throws std::runtime_error Если размер features != 6
+     */
     ClassificationResult predict(const std::vector<float>& features);
 
 private:
-    // Среда выполнения ONNX (должна жить всё время работы программы)
-    Ort::Env env{ORT_LOGGING_LEVEL_WARNING, "ADAS_Classifier"};
-    Ort::Session session{nullptr}; // Сессия загруженной модели
+    Ort::Env env{ORT_LOGGING_LEVEL_WARNING, "ADAS_Classifier"}; ///< Среда ONNX Runtime
+    Ort::Session session{nullptr};                               ///< Сессия модели
     
-    // Параметры нормализации
-    std::vector<float> mean_;
+    std::vector<float> mean_;                                    ///< Параметры нормализации
     std::vector<float> std_;
     std::vector<std::string> classes_;
 
-    // Вспомогательные методы
     std::vector<float> normalize(const std::vector<float>& x) const;
     std::vector<float> softmax(const std::vector<float>& logits) const;
-    
-    // Простой парсер JSON (без внешних библиотек)
     std::vector<float> parseJsonArray(const std::string& json, const std::string& key) const;
     std::vector<std::string> parseJsonStringArray(const std::string& json, const std::string& key) const;
 };

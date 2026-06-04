@@ -1,0 +1,17 @@
+# Doxygen configuration for Real Car ADAS Monitor
+
+PROJECT_NAME           = "Real Car ADAS Monitor"
+PROJECT_NUMBER         = "1.0.0"
+OUTPUT_DIRECTORY       = docs/doxygen
+INPUT                  = src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.cpp
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+HAVE_DOT               = NO
+WARN_IF_UNDOCUMENTED   = NO
